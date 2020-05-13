@@ -16,7 +16,10 @@ ticker = input()
 ticker = ticker.upper()
 
 # Getting the data set
-stock_data = data.DataReader(ticker, 'yahoo', start_date, end_date)
+try:
+    stock_data = data.DataReader(ticker, 'yahoo', start_date, end_date)
+except:
+    print("Double check your ticket symbol buddy, its case sensitive and market index dependent")
 stock_data['Returns'] = stock_data['Adj Close'].pct_change()
 
 
@@ -56,6 +59,7 @@ def plot_daily_return():
 
 def plot_return_distribution():
     ## Return distributions
+    plt.figure(figsize=(12,12))
     percent_return = stock_data['Returns']*100
 
     plt.hist(percent_return.dropna(), bins=100)
@@ -106,7 +110,7 @@ forecasted_values = np.empty([100, 2])
 
     
 def valueAtRisk():
-
+    plt.figure(figsize=(12,12))
     plot_hist()
     print('VAR 90')
     print('With 90% confidence we expect that our worst daily loss will not exceed {0:.2f}%'.format(var_90))
