@@ -11,15 +11,13 @@ start_date = input()
 #end_date = str(datetime.now().strftime('%Y-%m-%d'))
 print('What is the end date? ie 2020-01-01')
 end_date = input()
-print('What is the ticker? You can look it up on yahoo finance. Tips: Its case sensitive')
+print('What is the ticker? You can look it up on yahoo finance. Tips: Its case sensitive and make sure you use the exact same symbol')
 ticker = input()
 ticker = ticker.upper()
 
 # Getting the data set
-try:
-    stock_data = data.DataReader(ticker, 'yahoo', start_date, end_date)
-except:
-    print("Double check your ticket symbol buddy, its case sensitive and market index dependent")
+
+stock_data = data.DataReader(ticker, 'yahoo', start_date, end_date)
 stock_data['Returns'] = stock_data['Adj Close'].pct_change()
 
 
