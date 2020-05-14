@@ -93,7 +93,7 @@ def avgVolatility():
     # Calculate the annualized variance
     variance_annualized = sigma_annualized**2
     print('Annualized Variance is {} is '.format(ticker) + str(round(variance_annualized*100,0)) + '%')
-
+    print("Psst...A volatile stock has a high standard deviation, while the deviation of a stable blue-chip stock is usually rather low.")
 
 def plot_var_scale():   
     # Plot the forecased vs time    
@@ -196,4 +196,30 @@ def simulateRisk(tradingDays = 252,startingPrice = 1, numSim=500):
     # Show the simulations
     plt.title('Simulation of stock price for {} over {} trading days based on mean & volatility for {} times'.format(ticker, str(tradingDays),str(numSim)))
     plt.show()
+
+def annualised_sharpe(returns, N=252):
+    """
+    Calculate the annualised Sharpe ratio of a returns stream 
+    based on a number of trading periods, N. N defaults to 252,
+    which then assumes a stream of daily returns.
+
+    The function assumes that the returns are the excess of 
+    those compared to a benchmark.
+    """
+    return np.sqrt(N) * returns.mean() / returns.std()
+
+def equity_sharpe(risk_free_rate=0.05):
+    """
+    Calculates the annualised Sharpe ratio based on the daily
+    returns of an equity
+    The ratio compares the mean average of the excess returns of the asset or strategy with the standard deviation of those returns. Thus a lower volatility of returns will lead to a greater Sharpe ratio, assuming identical returns.
+    The "Sharpe Ratio" often quoted by those carrying out trading strategies is the annualised Sharpe, the calculation of which depends upon the trading period of which the returns are measured.
+    Note that the Sharpe ratio itself MUST be calculated based on the Sharpe of that particular time period type
+    """
+    sharp_df = risk[['Returns']].dropna().copy()
+
+    # assumming risk free rate of 5%
+    sharp_df['excess_daily_ret'] = sharp_df['Returns'] - (risk_free_rate/252)
+
+    print(annualised_sharpe(sharp_df['excess_daily_ret']))
 
