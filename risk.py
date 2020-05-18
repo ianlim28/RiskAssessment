@@ -110,7 +110,7 @@ def plot_var_scale(ticker):
 forecasted_values = np.empty([100, 2])
 
     
-def valueAtRisk(var_90,cvar_90, var_95, cvar_95, var_99, cvar_99):
+def valueAtRisk(StockReturns_perc, ticker, var_90,cvar_90, var_95, cvar_95, var_99, cvar_99):
     plt.figure(figsize=(12,12))
     plot_hist()
     print('VAR 90')
