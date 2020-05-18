@@ -46,10 +46,10 @@ def get_info():
     cvar_99 = StockReturns_perc[StockReturns_perc <= var_99].mean()
     return stock_data, StockReturns_perc, start_date, end_date, ticker, var_90, cvar_90, var_95, cvar_95, var_99, cvar_99
 
-stock_data, StockReturns_perc , start_date, end_date, ticker,  var_90, cvar_90, var_95, cvar_95, var_99, cvar_99 = get_info()
+#stock_data, StockReturns_perc , start_date, end_date, ticker,  var_90, cvar_90, var_95, cvar_95, var_99, cvar_99 = get_info()
 
 
-def plot_daily_return():
+def plot_daily_return(stock_data, ticker, start_date, end_date):
     ## Plot daily returns over time
     plt.figure(figsize=(12,12))
     stock_data['Returns'].plot()
@@ -58,7 +58,7 @@ def plot_daily_return():
     plt.show()
 
 
-def plot_return_distribution():
+def plot_return_distribution(stock_data, ticker, start_date, end_date):
     ## Return distributions
     plt.figure(figsize=(12,12))
     percent_return = stock_data['Returns']*100
@@ -68,7 +68,7 @@ def plot_return_distribution():
     plt.ylabel('Count')
     plt.show()
 
-def avgReturn(stock_data = stock_data, start_date = start_date, end_date = end_date):
+def avgReturn(stock_data , start_date , end_date , ticker):
     # Calculate the average daily return of the stock
     mean_return_daily = np.mean(stock_data['Returns'])
     print('Start Date : {}'.format(start_date))
@@ -80,7 +80,7 @@ def avgReturn(stock_data = stock_data, start_date = start_date, end_date = end_d
     print('{} Average Annualized Return: '.format(ticker) + str(round(mean_return_annualized*100,2))+ '%')
 
 
-def avgVolatility():
+def avgVolatility(stock_data , start_date, end_date, ticker):
     # Calculate the standard deviation of daily return of the stock
     sigma_daily = np.std(stock_data['Returns'])
     print('The average daily volatility of {}(std) is : '.format(ticker) + str(round(sigma_daily*100,2)) + '%')
@@ -98,7 +98,7 @@ def avgVolatility():
     print('Annualized Variance is {} is '.format(ticker) + str(round(variance_annualized*100,0)) + '%')
     print("Psst...A volatile stock has a high standard deviation, while the deviation of a stable blue-chip stock is usually rather low.")
 
-def plot_var_scale():   
+def plot_var_scale(ticker):   
     # Plot the forecased vs time    
     plt.plot(forecasted_values[:,0], -1*forecasted_values[:,1])    
     plt.xlabel('Time Horizon T+i')    
@@ -110,7 +110,7 @@ def plot_var_scale():
 forecasted_values = np.empty([100, 2])
 
     
-def valueAtRisk():
+def valueAtRisk(var_90,cvar_90, var_95, cvar_95, var_99, cvar_99):
     plt.figure(figsize=(12,12))
     plot_hist()
     print('VAR 90')
@@ -141,7 +141,7 @@ def valueAtRisk():
     plot_var_scale()
     print('with 95% confidence, we will not lose more than {0:.3f}% in any given month.'.format(var_95*np.sqrt(20)) )
 
-def plot_hist():    
+def plot_hist(StockReturns_perc, ticker , var_90, cvar_90, var_95, cvar_95, var_99, cvar_99):    
     plt.hist(StockReturns_perc['Returns'],bins=100, density=True)    
     # Charting parameters    
     plt.xlabel('Returns (%)')   
@@ -156,9 +156,9 @@ def plot_hist():
     plt.legend(loc='upper right')   
     plt.show()
 
-def simulateRisk(tradingDays = 252,startingPrice = 1, numSim=500):
+def simulateRisk(stock_data , ticker , tradingDays = 252,startingPrice = 1, numSim=500):
     """
-    Based the mean and volatility of the stock, simulate how will the share price look like in a random walk / monte carlo
+    Based on the mean and volatility of the stock, simulate how will the share price look like in a random walk / monte carlo
     252 is the average trading days per year
     """
 
@@ -211,7 +211,7 @@ def annualised_sharpe(returns, N=252):
     """
     return np.sqrt(N) * returns.mean() / returns.std()
 
-def equity_sharpe(risk_free_rate=0.05):
+def equity_sharpe(stock_data, risk_free_rate=0.05):
     """
     Calculates the annualised Sharpe ratio based on the daily
     returns of an equity
