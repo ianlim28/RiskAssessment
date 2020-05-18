@@ -19,11 +19,12 @@ def get_info():
     # Getting the data set
     stock_data = data.DataReader(ticker, 'yahoo', start_date, end_date)
     stock_data['Returns'] = stock_data['Adj Close'].pct_change()
+    stock_data.index = stock_data.index.astype(str)
+    # risk = stock_data.copy()
+    # risk.index = risk.index.astype(str)
 
-    risk = stock_data.copy()
-    risk.index = risk.index.astype(str)
-
-    StockReturns_perc = risk[['Returns']].dropna().copy()
+    #StockReturns_perc = risk[['Returns']].dropna().copy()
+    StockReturns_perc = stock_data[['Returns']].dropna().copy()
     StockReturns_perc = StockReturns_perc*100
 
     # Historical VaR(90) quantiles
@@ -43,7 +44,9 @@ def get_info():
 
     # Historical expected shortfall CVaR(99) quantiles
     cvar_99 = StockReturns_perc[StockReturns_perc <= var_99].mean()
-    return var_90, cvar_90, var_95, cvar_95, var_99, cvar_99
+    return stock_data, StockReturns_perc, start_date, end_date, ticker, var_90, cvar_90, var_95, cvar_95, var_99, cvar_99
+
+stock_data, StockReturns_perc , start_date, end_date, ticker,  var_90, cvar_90, var_95, cvar_95, var_99, cvar_99 = get_info()
 
 
 def plot_daily_return():
@@ -65,7 +68,7 @@ def plot_return_distribution():
     plt.ylabel('Count')
     plt.show()
 
-def avgReturn():
+def avgReturn(stock_data = stock_data, start_date = start_date, end_date = end_date):
     # Calculate the average daily return of the stock
     mean_return_daily = np.mean(stock_data['Returns'])
     print('Start Date : {}'.format(start_date))
@@ -217,10 +220,11 @@ def equity_sharpe(risk_free_rate=0.05):
     Note that the Sharpe ratio itself MUST be calculated based on the Sharpe of that particular time period type
     As a retail algorithmic trader, if you can achieve a Sharpe ratio  then you are doing very well.
     """
-    sharp_df = risk[['Returns']].dropna().copy()
+    sharp_df = stock_data[['Returns']].dropna().copy()
 
     # assumming risk free rate of 5%
     sharp_df['excess_daily_ret'] = sharp_df['Returns'] - (risk_free_rate/252)
 
     print(annualised_sharpe(sharp_df['excess_daily_ret']))
+
 
