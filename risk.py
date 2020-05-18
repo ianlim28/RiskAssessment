@@ -112,7 +112,7 @@ forecasted_values = np.empty([100, 2])
     
 def valueAtRisk(StockReturns_perc, ticker, var_90,cvar_90, var_95, cvar_95, var_99, cvar_99):
     plt.figure(figsize=(12,12))
-    plot_hist()
+    plot_hist(StockReturns_perc, ticker, var_90,cvar_90, var_95, cvar_95, var_99, cvar_99)
     print('VAR 90')
     print('With 90% confidence we expect that our worst daily loss will not exceed {0:.2f}%'.format(var_90))
     #print('The minimum loss this asset has sustained in the worst 10% is {0:.2f}%'.format(var_90)) 
