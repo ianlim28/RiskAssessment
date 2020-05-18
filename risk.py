@@ -138,7 +138,7 @@ def valueAtRisk(StockReturns_perc, ticker, var_90,cvar_90, var_95, cvar_95, var_
         forecasted_values[i, 1] = var_95*np.sqrt(i+1)
     
     # Plot var over time 
-    plot_var_scale()
+    plot_var_scale(ticker)
     print('with 95% confidence, we will not lose more than {0:.3f}% in any given month.'.format(var_95*np.sqrt(20)) )
 
 def plot_hist(StockReturns_perc, ticker , var_90, cvar_90, var_95, cvar_95, var_99, cvar_99):    
