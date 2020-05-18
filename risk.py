@@ -6,44 +6,44 @@ import numpy as np
 from datetime import datetime
 from scipy.stats import norm
 
-print('What is the start date? ie 2016-01-01')
-start_date = input()
-#end_date = str(datetime.now().strftime('%Y-%m-%d'))
-print('What is the end date? ie 2020-01-01')
-end_date = input()
-print('What is the ticker? You can look it up on yahoo finance. Tips: Its case sensitive and make sure you use the exact same symbol')
-ticker = input()
-ticker = ticker.upper()
 
-# Getting the data set
+def get_info():
+    print('What is the start date? ie 2016-01-01')
+    start_date = input()
+    #end_date = str(datetime.now().strftime('%Y-%m-%d'))
+    print('What is the end date? ie 2020-01-01')
+    end_date = input()
+    print('What is the ticker? You can look it up on yahoo finance. Tips: Its case sensitive and make sure you use the exact same symbol')
+    ticker = input()
+    ticker = ticker.upper()
+    # Getting the data set
+    stock_data = data.DataReader(ticker, 'yahoo', start_date, end_date)
+    stock_data['Returns'] = stock_data['Adj Close'].pct_change()
 
-stock_data = data.DataReader(ticker, 'yahoo', start_date, end_date)
-stock_data['Returns'] = stock_data['Adj Close'].pct_change()
+    risk = stock_data.copy()
+    risk.index = risk.index.astype(str)
 
+    StockReturns_perc = risk[['Returns']].dropna().copy()
+    StockReturns_perc = StockReturns_perc*100
 
-risk = stock_data.copy()
-risk.index = risk.index.astype(str)
+    # Historical VaR(90) quantiles
+    var_90 = np.percentile(StockReturns_perc, 10)
 
-StockReturns_perc = risk[['Returns']].dropna().copy()
-StockReturns_perc = StockReturns_perc*100
+    # Historical expected shortfall CVaR(90) quantiles
+    cvar_90 = StockReturns_perc[StockReturns_perc <= var_90].mean()
 
-# Historical VaR(90) quantiles
-var_90 = np.percentile(StockReturns_perc, 10)
+    # Historical VaR(95) quantiles
+    var_95 = np.percentile(StockReturns_perc, 5)
+                                                                                        
+    # Historical expected shortfall CVaR(95) quantiles
+    cvar_95 = StockReturns_perc[StockReturns_perc <= var_95].mean()
 
-# Historical expected shortfall CVaR(90) quantiles
-cvar_90 = StockReturns_perc[StockReturns_perc <= var_90].mean()
+    # Historical VaR(99) quantiles
+    var_99 = np.percentile(StockReturns_perc, 1)
 
-# Historical VaR(95) quantiles
-var_95 = np.percentile(StockReturns_perc, 5)
-                                                                                    
-# Historical expected shortfall CVaR(95) quantiles
-cvar_95 = StockReturns_perc[StockReturns_perc <= var_95].mean()
-
-# Historical VaR(99) quantiles
-var_99 = np.percentile(StockReturns_perc, 1)
-
-# Historical expected shortfall CVaR(99) quantiles
-cvar_99 = StockReturns_perc[StockReturns_perc <= var_99].mean()
+    # Historical expected shortfall CVaR(99) quantiles
+    cvar_99 = StockReturns_perc[StockReturns_perc <= var_99].mean()
+    return var_90, cvar_90, var_95, cvar_95, var_99, cvar_99
 
 
 def plot_daily_return():
@@ -215,6 +215,7 @@ def equity_sharpe(risk_free_rate=0.05):
     The ratio compares the mean average of the excess returns of the asset or strategy with the standard deviation of those returns. Thus a lower volatility of returns will lead to a greater Sharpe ratio, assuming identical returns.
     The "Sharpe Ratio" often quoted by those carrying out trading strategies is the annualised Sharpe, the calculation of which depends upon the trading period of which the returns are measured.
     Note that the Sharpe ratio itself MUST be calculated based on the Sharpe of that particular time period type
+    As a retail algorithmic trader, if you can achieve a Sharpe ratio  then you are doing very well.
     """
     sharp_df = risk[['Returns']].dropna().copy()
 
